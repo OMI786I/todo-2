@@ -19,13 +19,35 @@ const Main = () => {
 
   //   http://localhost:3000/main/api/example@gmail.com
 
-  const { isPending, error, data } = useQuery({
+  const { isPending, error, data, refetch } = useQuery({
     queryKey: ["repoData"],
     queryFn: () =>
       fetch(`http://localhost:3000/main/api/${session.user.email}`).then(
         (res) => res.json()
       ),
   });
+
+  const handleDelete = async (id) => {
+    console.log(id);
+    const deleted = await fetch(`http://localhost:3000/main/api/id/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const resp = await deleted.json();
+    if (resp?.response?.deletedCount > 0) {
+      refetch();
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your data has been deleted",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
 
   const handleAddTodo = async (data) => {
     console.log(data.todo);
@@ -44,6 +66,7 @@ const Main = () => {
       credentials: "same-origin",
     });
     if (resp.status === 200) {
+      refetch();
       Swal.fire({
         position: "top-end",
         icon: "success",
@@ -96,7 +119,10 @@ const Main = () => {
                     className="flex justify-between items-center p-2 bg-white rounded-md shadow"
                   >
                     <span className="text-gray-800">{res.todo}</span>
-                    <button className="text-red-500 hover:text-red-700 transition">
+                    <button
+                      onClick={() => handleDelete(res._id)}
+                      className="text-red-500 hover:text-red-700 transition"
+                    >
                       Delete
                     </button>
                   </li>
