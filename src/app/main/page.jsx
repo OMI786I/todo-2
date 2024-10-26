@@ -2,8 +2,11 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 
 const Main = () => {
+  const { register, handleSubmit, reset } = useForm();
   const { data: session } = useSession();
   console.log(session);
   const [todo, setTodo] = useState("");
@@ -12,14 +15,32 @@ const Main = () => {
     { id: 2, text: "Build a Todo App" },
     { id: 3, text: "Deploy the App" },
   ];
-  const handleInputChange = (e) => {
-    setTodo(e.target.value);
-  };
 
-  const handleAddTodo = (e) => {
-    e.preventDefault();
-    // Logic to add the todo will go here
-    setTodo(""); // Clear input after adding
+  const handleAddTodo = async (data) => {
+    console.log(data.todo);
+    reset();
+    const toSend = {
+      todo: data.todo,
+      email: session.user.email,
+    };
+
+    const resp = await fetch("http://localhost:3000/main/api", {
+      method: "POST",
+      body: JSON.stringify(toSend),
+      headers: {
+        "content-type": "application/json",
+      },
+      credentials: "same-origin",
+    });
+    if (resp.status === 200) {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your data has been saved",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
   };
 
   return (
@@ -30,18 +51,15 @@ const Main = () => {
       {session?.user?.email ? (
         <div>
           <div className="flex justify-center">
-            {" "}
             <form
-              onSubmit={handleAddTodo}
+              onSubmit={handleSubmit(handleAddTodo)}
               className="flex w-full max-w-md mt-4"
             >
               <input
                 type="text"
-                value={todo}
-                onChange={handleInputChange}
+                {...register("todo", { required: true })}
                 className="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring focus:ring-blue-500"
                 placeholder="Add a new task..."
-                required
               />
               <button
                 type="submit"
