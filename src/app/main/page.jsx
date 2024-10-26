@@ -119,14 +119,6 @@ const Main = () => {
     }
   };
 
-  if (isPending) {
-    return (
-      <div className="flex justify-center">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
-  }
-
   return (
     <div>
       <header className="w-full text-center py-4">
@@ -177,7 +169,7 @@ const Main = () => {
                   </li>
                 ))
               ) : (
-                <span className="loading loading-spinner loading-lg"></span>
+                <span>Add task to see here</span>
               )}
             </ul>
           </div>
