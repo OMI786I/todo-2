@@ -1,5 +1,6 @@
 "use client";
 import { signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import React from "react";
 
 const Navbar = () => {
@@ -38,7 +39,10 @@ const Navbar = () => {
               Logout
             </button>
           ) : (
-            ""
+            <Link href={"/"}>
+              {" "}
+              <button className="btn btn-success text-white">Home</button>
+            </Link>
           )}
         </div>
       </div>

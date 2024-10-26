@@ -12,12 +12,18 @@ import {
 
 const queryClient = new QueryClient();
 const Main = () => {
-  const { register, handleSubmit, reset } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
   const { data: session } = useSession();
-  console.log(session);
   const [todo, setTodo] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentTodoId, setCurrentTodoId] = useState(null);
 
-  //   http://localhost:3000/main/api/example@gmail.com
+  const modalForm = useForm(); // Separate form state for the modal
 
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["repoData"],
@@ -26,6 +32,17 @@ const Main = () => {
         (res) => res.json()
       ),
   });
+
+  const openModal = (id, todoText) => {
+    setCurrentTodoId(id);
+    modalForm.setValue("todo", todoText); // Set initial value in modal form
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    modalForm.reset();
+  };
 
   const handleDelete = async (id) => {
     console.log(id);
@@ -50,8 +67,6 @@ const Main = () => {
   };
 
   const handleAddTodo = async (data) => {
-    console.log(data.todo);
-    reset();
     const toSend = {
       todo: data.todo,
       email: session.user.email,
@@ -74,9 +89,36 @@ const Main = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+      reset();
     }
   };
-  console.log(data?.myData);
+
+  const handleUpdateTodo = async (formData) => {
+    const updatedData = { todo: formData.todo, email: session.user.email };
+    const resp = await fetch(
+      `http://localhost:3000/main/api/id/${currentTodoId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(updatedData),
+        headers: {
+          "content-type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+    if (resp.status === 200) {
+      refetch();
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your data has been updated",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      closeModal(); // Close modal after successful update
+    }
+  };
+
   if (isPending) {
     return (
       <div className="flex justify-center">
@@ -84,6 +126,7 @@ const Main = () => {
       </div>
     );
   }
+
   return (
     <div>
       <header className="w-full text-center py-4">
@@ -125,6 +168,12 @@ const Main = () => {
                     >
                       Delete
                     </button>
+                    <button
+                      onClick={() => openModal(res._id, res.todo)}
+                      className="text-blue-500 hover:text-blue-700 transition"
+                    >
+                      Update
+                    </button>
                   </li>
                 ))
               ) : (
@@ -132,6 +181,42 @@ const Main = () => {
               )}
             </ul>
           </div>
+          {isModalOpen && (
+            <dialog id="my_modal_1" className="modal" open>
+              <div className="modal-box">
+                <h3 className="font-bold text-lg">Update Todo</h3>
+                <form onSubmit={modalForm.handleSubmit(handleUpdateTodo)}>
+                  <div className="mb-4">
+                    <label className="block text-gray-700 font-bold mb-2">
+                      Update task
+                    </label>
+                    <input
+                      type="text"
+                      {...modalForm.register("todo", {
+                        required: "This field is required",
+                      })}
+                      className="input input-bordered w-full"
+                      placeholder="Update your task"
+                    />
+                    {modalForm.formState.errors.todo && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {modalForm.formState.errors.todo.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="modal-action">
+                    <button type="submit" className="btn btn-primary">
+                      Submit
+                    </button>
+                    <button type="button" onClick={closeModal} className="btn">
+                      Close
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </dialog>
+          )}
         </div>
       ) : (
         <div className="text-center font-bold">
