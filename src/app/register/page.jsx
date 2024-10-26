@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 
 const Register = () => {
   const {
@@ -20,6 +21,15 @@ const Register = () => {
         "content-type": "application/json",
       },
     });
+    if (resp.status === 200) {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your data has been saved",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
   };
 
   return (
@@ -133,7 +143,7 @@ const Register = () => {
                 {errors.terms && (
                   <p className="text-red-500 text-xs">{errors.terms.message}</p>
                 )}
-                <button type="submit" className="btn btn-info text-white">
+                <button type="submit" className="btn btn-primary  text-white">
                   Create an account
                 </button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
@@ -142,7 +152,7 @@ const Register = () => {
                     href="#"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                   >
-                    Register here
+                    Login here
                   </a>
                 </p>
               </form>
