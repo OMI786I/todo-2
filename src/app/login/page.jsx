@@ -99,7 +99,7 @@ const Login = () => {
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Do not have an account?{" "}
                   <a
-                    href="#"
+                    href="/register"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                   >
                     Register here
