@@ -4,17 +4,28 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 
+const queryClient = new QueryClient();
 const Main = () => {
   const { register, handleSubmit, reset } = useForm();
   const { data: session } = useSession();
   console.log(session);
   const [todo, setTodo] = useState("");
-  const todos = [
-    { id: 1, text: "Learn React" },
-    { id: 2, text: "Build a Todo App" },
-    { id: 3, text: "Deploy the App" },
-  ];
+
+  //   http://localhost:3000/main/api/example@gmail.com
+
+  const { isPending, error, data } = useQuery({
+    queryKey: ["repoData"],
+    queryFn: () =>
+      fetch(`http://localhost:3000/main/api/${session.user.email}`).then(
+        (res) => res.json()
+      ),
+  });
 
   const handleAddTodo = async (data) => {
     console.log(data.todo);
@@ -42,7 +53,14 @@ const Main = () => {
       });
     }
   };
-
+  console.log(data?.myData);
+  if (isPending) {
+    return (
+      <div className="flex justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
   return (
     <div>
       <header className="w-full text-center py-4">
@@ -71,17 +89,21 @@ const Main = () => {
           </div>
           <div className="w-full p-16 max-w-md mt-4">
             <ul className="space-y-2">
-              {todos.map((todo) => (
-                <li
-                  key={todo.id}
-                  className="flex justify-between items-center p-2 bg-white rounded-md shadow"
-                >
-                  <span className="text-gray-800">{todo.text}</span>
-                  <button className="text-red-500 hover:text-red-700 transition">
-                    Delete
-                  </button>
-                </li>
-              ))}
+              {data && data.myData.length > 0 ? (
+                data.myData.map((res) => (
+                  <li
+                    key={res._id}
+                    className="flex justify-between items-center p-2 bg-white rounded-md shadow"
+                  >
+                    <span className="text-gray-800">{res.todo}</span>
+                    <button className="text-red-500 hover:text-red-700 transition">
+                      Delete
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <span className="loading loading-spinner loading-lg"></span>
+              )}
             </ul>
           </div>
         </div>
