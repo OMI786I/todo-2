@@ -13,10 +13,15 @@ const Register = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
+    const toSendData = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
     console.log(data);
     const resp = await fetch("http://localhost:3000/register/api", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify(toSendData),
       headers: {
         "content-type": "application/json",
       },
