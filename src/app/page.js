@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-
+export const dynamic = "force-dynamic";
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-blue-500 to-indigo-700 text-white">

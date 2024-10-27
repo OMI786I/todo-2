@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -26,14 +26,6 @@ const Login = () => {
     });
 
     console.log(data);
-
-    if (result.error) {
-      // Handle error here
-      console.error("Login error:", result.error);
-    } else {
-      // Redirect to the dashboard or home page after successful login
-      window.location.href = "/dashboard"; // Change '/dashboard' to your desired path
-    }
   };
 
   return (
@@ -114,4 +106,10 @@ const Login = () => {
   );
 };
 
-export default Login;
+const LoginWrapper = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <Login />
+  </Suspense>
+);
+
+export default LoginWrapper;
