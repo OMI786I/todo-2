@@ -28,9 +28,9 @@ const Main = () => {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["repoData"],
     queryFn: () =>
-      fetch(`http://localhost:3000/main/api/${session.user.email}`).then(
-        (res) => res.json()
-      ),
+      fetch(
+        `https://todo-2-omega.vercel.app/main/api/${session.user.email}`
+      ).then((res) => res.json()),
   });
 
   const openModal = (id, todoText) => {
@@ -46,13 +46,16 @@ const Main = () => {
 
   const handleDelete = async (id) => {
     console.log(id);
-    const deleted = await fetch(`http://localhost:3000/main/api/id/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    const deleted = await fetch(
+      `https://todo-2-omega.vercel.app/main/api/id/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
     const resp = await deleted.json();
     if (resp?.response?.deletedCount > 0) {
       refetch();
@@ -72,7 +75,7 @@ const Main = () => {
       email: session.user.email,
     };
 
-    const resp = await fetch("http://localhost:3000/main/api", {
+    const resp = await fetch("https://todo-2-omega.vercel.app/main/api", {
       method: "POST",
       body: JSON.stringify(toSend),
       headers: {
@@ -96,7 +99,7 @@ const Main = () => {
   const handleUpdateTodo = async (formData) => {
     const updatedData = { todo: formData.todo, email: session.user.email };
     const resp = await fetch(
-      `http://localhost:3000/main/api/id/${currentTodoId}`,
+      `https://todo-2-omega.vercel.app/main/api/id/${currentTodoId}`,
       {
         method: "PATCH",
         body: JSON.stringify(updatedData),

@@ -19,7 +19,7 @@ const Register = () => {
       password: data.password,
     };
     console.log(data);
-    const resp = await fetch("http://localhost:3000/register/api", {
+    const resp = await fetch("https://todo-2-omega.vercel.app/register/api", {
       method: "POST",
       body: JSON.stringify(toSendData),
       headers: {
